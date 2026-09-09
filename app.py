@@ -5,253 +5,181 @@ import os
 
 app = Flask(__name__)
 
-# Load trained model
-MODEL_PATH = os.path.join(os.path.dirname(__file__), "linear.pkl")
-model = joblib.load(MODEL_PATH)
+# Load Model
+model = joblib.load("linear.pkl")
 
 HTML = """
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>House Price Predictor</title>
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, Helvetica, sans-serif;
+
+        *{
+            margin:0;
+            padding:0;
+            box-sizing:border-box;
+            font-family:Arial, sans-serif;
         }
 
-        body {
-            min-height: 100vh;
+        body{
+            min-height:100vh;
+            display:flex;
+            justify-content:center;
+            align-items:center;
+
             background:
-                radial-gradient(circle at top left, #dbeafe, transparent 35%),
-                radial-gradient(circle at bottom right, #ede9fe, transparent 35%),
-                linear-gradient(135deg, #f8fafc, #eef2ff);
-
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 30px;
+            linear-gradient(135deg,#667eea,#764ba2);
+            padding:20px;
         }
 
-        .container {
-            width: 100%;
-            max-width: 950px;
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: 28px;
+        .container{
+
+            width:100%;
+            max-width:950px;
+
+            background:rgba(255,255,255,0.95);
+
+            border-radius:25px;
 
             box-shadow:
-                0 25px 60px rgba(15, 23, 42, 0.18),
-                0 8px 20px rgba(99, 102, 241, 0.10);
+            0 20px 50px rgba(0,0,0,0.25);
 
-            overflow: hidden;
-            backdrop-filter: blur(12px);
+            overflow:hidden;
         }
 
-        .header {
-            padding: 35px;
-            text-align: center;
+        .header{
 
-            background: linear-gradient(
-                135deg,
-                #4f46e5,
-                #7c3aed
-            );
+            background:
+            linear-gradient(135deg,#4f46e5,#7c3aed);
 
-            color: white;
+            color:white;
+            text-align:center;
+            padding:35px;
         }
 
-        .header h1 {
-            font-size: 34px;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
+        .header h1{
+            font-size:34px;
         }
 
-        .header p {
-            font-size: 15px;
-            opacity: 0.9;
+        .header p{
+            margin-top:10px;
+            opacity:0.9;
         }
 
-        .form-area {
-            padding: 38px;
+        .form-area{
+            padding:35px;
         }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 24px;
+        .grid{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:20px;
         }
 
-        .field {
-            display: flex;
-            flex-direction: column;
+        .field{
+            display:flex;
+            flex-direction:column;
         }
 
-        label {
-            font-weight: 700;
-            color: #334155;
-            margin-bottom: 9px;
-            font-size: 14px;
+        label{
+            margin-bottom:8px;
+            font-weight:600;
+            color:#374151;
         }
 
-        input,
-        select {
-            width: 100%;
-            padding: 14px 16px;
+        input, select{
 
-            border: 1px solid #dbe2ea;
-            border-radius: 13px;
+            padding:15px;
+            border:none;
+            border-radius:12px;
 
-            background: #f8fafc;
-            color: #1e293b;
+            background:#f3f4f6;
 
-            font-size: 15px;
-            outline: none;
-
-            transition: all 0.25s ease;
+            font-size:15px;
 
             box-shadow:
-                inset 0 1px 2px rgba(0,0,0,0.03);
+            inset 0 2px 5px rgba(0,0,0,0.05);
+
+            transition:0.3s;
         }
 
         input:focus,
-        select:focus {
-            border-color: #6366f1;
-            background: white;
+        select:focus{
+
+            outline:none;
 
             box-shadow:
-                0 0 0 4px rgba(99,102,241,0.12),
-                0 6px 18px rgba(99,102,241,0.08);
-
-            transform: translateY(-1px);
+            0 0 0 4px rgba(99,102,241,0.2);
         }
 
-        select {
-            cursor: pointer;
+        .full{
+            grid-column:1/3;
         }
 
-        .full {
-            grid-column: 1 / -1;
-        }
+        button{
 
-        .predict-btn {
-            width: 100%;
-            margin-top: 30px;
+            width:100%;
+            margin-top:30px;
+            padding:16px;
 
-            padding: 16px;
+            border:none;
+            border-radius:15px;
 
-            border: none;
-            border-radius: 14px;
+            background:
+            linear-gradient(135deg,#4f46e5,#7c3aed);
 
-            background: linear-gradient(
-                135deg,
-                #4f46e5,
-                #7c3aed
-            );
+            color:white;
+            font-size:18px;
+            font-weight:bold;
 
-            color: white;
-            font-size: 17px;
-            font-weight: 700;
-
-            cursor: pointer;
+            cursor:pointer;
 
             box-shadow:
-                0 10px 25px rgba(79,70,229,0.30);
+            0 10px 25px rgba(79,70,229,0.3);
 
-            transition: all 0.25s ease;
+            transition:0.3s;
         }
 
-        .predict-btn:hover {
-            transform: translateY(-3px);
+        button:hover{
+            transform:translateY(-3px);
+        }
+
+        .result{
+
+            margin-top:25px;
+            padding:25px;
+
+            text-align:center;
+
+            background:#ecfdf5;
+
+            border-radius:15px;
 
             box-shadow:
-                0 15px 35px rgba(79,70,229,0.38);
+            0 10px 20px rgba(0,0,0,0.1);
         }
 
-        .predict-btn:active {
-            transform: translateY(0);
+        .price{
+            font-size:35px;
+            color:#16a34a;
+            font-weight:bold;
         }
 
-        .result {
-            margin-top: 28px;
-            padding: 24px;
+        @media(max-width:700px){
 
-            border-radius: 18px;
-
-            text-align: center;
-
-            background: linear-gradient(
-                135deg,
-                #ecfdf5,
-                #f0fdf4
-            );
-
-            border: 1px solid #bbf7d0;
-
-            box-shadow:
-                0 10px 25px rgba(34,197,94,0.10);
-        }
-
-        .result-title {
-            color: #166534;
-            font-size: 14px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .price {
-            color: #15803d;
-            font-size: 32px;
-            font-weight: 800;
-        }
-
-        .error {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 12px;
-
-            background: #fef2f2;
-            color: #b91c1c;
-
-            text-align: center;
-            font-weight: 600;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 20px;
-            color: #64748b;
-            font-size: 13px;
-            background: #f8fafc;
-        }
-
-        @media (max-width: 700px) {
-            body {
-                padding: 15px;
+            .grid{
+                grid-template-columns:1fr;
             }
 
-            .grid {
-                grid-template-columns: 1fr;
-            }
-
-            .full {
-                grid-column: auto;
-            }
-
-            .header h1 {
-                font-size: 27px;
-            }
-
-            .form-area {
-                padding: 25px;
+            .full{
+                grid-column:auto;
             }
         }
+
     </style>
+
 </head>
 
 <body>
@@ -260,7 +188,7 @@ HTML = """
 
     <div class="header">
         <h1>🏠 House Price Predictor</h1>
-        <p>AI-powered house price prediction using Linear Regression</p>
+        <p>Linear Regression Model</p>
     </div>
 
     <div class="form-area">
@@ -271,120 +199,72 @@ HTML = """
 
                 <div class="field">
                     <label>Square Footage</label>
-                    <input
-                        type="number"
-                        name="Square_Footage"
-                        placeholder="Example: 1800"
-                        min="1"
-                        step="any"
-                        required
-                    >
+                    <input type="number" name="Square_Footage" required>
                 </div>
 
                 <div class="field">
-                    <label>Number of Bedrooms</label>
-                    <input
-                        type="number"
-                        name="Num_Bedrooms"
-                        placeholder="Example: 3"
-                        min="0"
-                        step="1"
-                        required
-                    >
+                    <label>Bedrooms</label>
+                    <input type="number" name="Num_Bedrooms" required>
                 </div>
 
                 <div class="field">
-                    <label>Number of Bathrooms</label>
-                    <input
-                        type="number"
-                        name="Num_Bathrooms"
-                        placeholder="Example: 2"
-                        min="0"
-                        step="any"
-                        required
-                    >
+                    <label>Bathrooms</label>
+                    <input type="number" step="any" name="Num_Bathrooms" required>
                 </div>
 
                 <div class="field">
                     <label>Year Built</label>
-                    <input
-                        type="number"
-                        name="Year_Built"
-                        placeholder="Example: 2015"
-                        min="1800"
-                        max="2100"
-                        required
-                    >
+                    <input type="number" name="Year_Built" required>
                 </div>
 
                 <div class="field">
                     <label>Lot Size</label>
-                    <input
-                        type="number"
-                        name="Lot_Size"
-                        placeholder="Example: 5000"
-                        min="0"
-                        step="any"
-                        required
-                    >
+                    <input type="number" step="any" name="Lot_Size" required>
                 </div>
 
                 <div class="field">
                     <label>Garage Size</label>
-                    <input
-                        type="number"
-                        name="Garage_Size"
-                        placeholder="Example: 2"
-                        min="0"
-                        step="any"
-                        required
-                    >
+                    <input type="number" step="any" name="Garage_Size" required>
                 </div>
 
                 <div class="field full">
+
                     <label>Neighborhood Quality</label>
 
                     <select name="Neighborhood_Quality" required>
-                        <option value="">Select Neighborhood Quality</option>
 
                         <option value="1">Poor</option>
                         <option value="2">Average</option>
                         <option value="3">Good</option>
                         <option value="4">Very Good</option>
                         <option value="5">Excellent</option>
+
                     </select>
+
                 </div>
 
             </div>
 
-            <button class="predict-btn" type="submit">
-                ✨ Predict House Price
+            <button type="submit">
+                Predict Price
             </button>
 
         </form>
 
         {% if prediction %}
+
         <div class="result">
-            <div class="result-title">
-                ESTIMATED HOUSE PRICE
-            </div>
+
+            <h3>Predicted House Price</h3>
 
             <div class="price">
                 ₹ {{ prediction }}
             </div>
+
         </div>
+
         {% endif %}
 
-        {% if error %}
-        <div class="error">
-            {{ error }}
-        </div>
-        {% endif %}
-
-    </div>
-
-    <div class="footer">
-        Linear Regression Model • Machine Learning Prediction
     </div>
 
 </div>
@@ -393,54 +273,35 @@ HTML = """
 </html>
 """
 
-
-@app.route("/", methods=["GET", "POST"])
+@app.route("/", methods=["GET","POST"])
 def home():
 
     prediction = None
-    error = None
 
     if request.method == "POST":
 
         try:
-            square_footage = float(request.form["Square_Footage"])
-            bedrooms = float(request.form["Num_Bedrooms"])
-            bathrooms = float(request.form["Num_Bathrooms"])
-            year_built = float(request.form["Year_Built"])
-            lot_size = float(request.form["Lot_Size"])
-            garage_size = float(request.form["Garage_Size"])
 
-            # Categorical value converted to numeric value
-            neighborhood_quality = float(
-                request.form["Neighborhood_Quality"]
-            )
-
-            # IMPORTANT:
-            # Order must match model.feature_names_in_
-            features = np.array([[
-                square_footage,
-                bedrooms,
-                bathrooms,
-                year_built,
-                lot_size,
-                garage_size,
-                neighborhood_quality
+            data = np.array([[
+                float(request.form["Square_Footage"]),
+                float(request.form["Num_Bedrooms"]),
+                float(request.form["Num_Bathrooms"]),
+                float(request.form["Year_Built"]),
+                float(request.form["Lot_Size"]),
+                float(request.form["Garage_Size"]),
+                float(request.form["Neighborhood_Quality"])
             ]])
 
-            result = model.predict(features)[0]
+            result = model.predict(data)[0]
 
-            prediction = f"{result:,.2f}"
+            prediction = format(result, ",.2f")
 
         except Exception as e:
-            error = "Please enter valid values. Prediction could not be generated."
+            prediction = "Error"
 
     return render_template_string(
         HTML,
-        prediction=prediction,
-        error=error
+        prediction=prediction
     )
 
-
-# Vercel uses this Flask application
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000, debug=True)
+app = app
